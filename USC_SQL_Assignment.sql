@@ -127,5 +127,117 @@ order by last_name
 
 
 
+#7a. The music of Queen and Kris Kristofferson have seen an unlikely resurgence. 
+#As an unintended consequence, films starting with the letters K and Q have also soared in popularity. 
+#Use subqueries to display the titles of movies starting with the letters K and Q whose language is English.
+select * from film
+where title like'K%' or title like 'Q%'
 
-    
+#7b. Use subqueries to display all actors who appear in the film Alone Trip.
+select title,first_name, last_name 
+from 
+(select * from film
+where title ='Alone Trip') a
+join film_actor b 
+on a.film_id=b.film_ID
+join actor c
+on b.actor_ID=c.actor_ID
+
+#7c. You want to run an email marketing campaign in Canada, 
+#for which you will need the names and email addresses of all Canadian customers. Use joins to retrieve this information.
+
+select c.first_name, c.last_name, c.email
+from customer c
+join address a
+on c.address_id = a.address_id
+join city b
+on a.city_id = b.city_id
+join country d
+on b.country_id = d.country_id
+where country = "CANADA";
+
+#7d. Sales have been lagging among young families, 
+#and you wish to target all family movies for a promotion. 
+#Identify all movies categorized as famiy films.
+
+select title, name as Cateory
+from 
+(select * from category where name ='Family') a
+join film_category b 
+on a.category_ID=b.category_id
+join film c
+on b.film_ID=c.film_ID
+
+#7e. Display the most frequently rented movies in descending order.
+select title,count(a.inventory_ID) as rented_times
+from rental b
+join inventory a
+on a.inventory_id=b.inventory_id
+join film c
+on a.film_ID=c.film_ID
+group by title
+order by count(a.inventory_ID) desc
+
+
+#7f. Write a query to display how much business, in dollars, each store brought in.
+select a.store_id, sum(d.amount) as 'Total_Revenue'
+from  store a
+join inventory b
+on a.store_id = b.store_id
+join rental c
+on b.inventory_id = c.inventory_id
+join payment d
+on c.rental_id = d.rental_id
+group by a.store_id;
+
+#7g. Write a query to display for each store its store ID, city, and country.
+select b.store_id, c.city, d.country
+from store b
+join address a
+on b.address_id = a.address_id
+join city c
+on a.city_id = c.city_id
+join country d
+on c.country_id = d.country_id;
+
+#7h. List the top five genres in gross revenue in descending order. 
+#(Hint: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
+select a.name as 'Movie Genres', sum(e.amount) as 'Gross Revenue'
+from category a
+join film_category b
+on a.category_id = b.category_id
+join inventory c
+on b.film_id = c.film_id
+join rental d
+on c.inventory_id = d.inventory_id
+join payment e
+on d.rental_id = e.rental_id
+group by a.category_id
+order by sum(e.amount) desc
+limit 5;
+
+
+#8a. In your new role as an executive, you would like to have an easy way of viewing the Top five genres by gross revenue. Use the solution from the problem above to create a view. If you haven't solved 7h, you can substitute another query to create a view.
+CREATE VIEW `top_five_genres` as 
+select a.name as 'Movie Genres', sum(e.amount) as 'Gross Revenue'
+from category a
+join film_category b
+on a.category_id = b.category_id
+join inventory c
+on b.film_id = c.film_id
+join rental d
+on c.inventory_id = d.inventory_id
+join payment e
+on d.rental_id = e.rental_id
+group by a.category_id
+order by sum(e.amount) desc
+limit 5;
+
+
+#8b. How would you display the view that you created in 8a?
+SELECT * FROM `top_five_genres`;
+
+#8c. You find that you no longer need the view top_five_genres. Write a query to delete it.
+DROP VIEW `top_five_genres`;
+
+
