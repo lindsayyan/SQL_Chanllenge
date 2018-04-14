@@ -1,3 +1,4 @@
+use skila;
 ##1a
 select first_name,last_name from sakila.actor
 
